@@ -1,8 +1,26 @@
-argparse==1.4.0
-beautifulsoup4==4.9.3
-dnspython==2.1.0
-requests==2.25.1
+# argparse==1.4.0
+# beautifulsoup4==4.9.3
+# beautifulsoup4==4.10.0
+# dnspython==2.1.0
+# dnspython==2.2.0
+# requests==2.28.2
 #socket==0.8.0
-urllib3==1.26.7
-wafw00f==2.1.0
-
+# urllib3==1.26.15
+# wafw00f==2.2.0
+# prettify==0.1.1
+# nmap==0.0.1
+# python-nmap==0.6.1
+# openai
+# xmltodict==0.12.0
+# python-dotenv==0.19.1
+# dicttoxml==1.7.4
+argparse
+beautifulsoup4
+dnspython
+nmap
+openai
+python-dotenv
+python-nmap
+requests
+shodan
+xmltodict
