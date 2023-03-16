@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import requests
 import dns.resolver
 from bs4 import BeautifulSoup
-from wafw00f import WafW00F
+from wafw00f.main import WafW00F
 
 # Subdomain scanner function
 def subdomain_scan(domain, subdomains_input):
