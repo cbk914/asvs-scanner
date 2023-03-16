@@ -11,25 +11,24 @@ from bs4 import BeautifulSoup
 from wafw00f import WafW00F
 
 # Subdomain scanner function
-def subdomain_scan(domain, subdomain_file=None):
+def subdomain_scan(domain, subdomains_input):
     subdomains = []
-    if subdomain_file:
-        with open(subdomain_file, 'r') as file:
-            for line in file:
-                subdomain = line.strip()
-                if subdomain.endswith(domain):
-                    subdomains.append(subdomain)
-                    print(f"Found subdomain: {subdomain}")
+
+    if subdomains_input and os.path.isfile(subdomains_input):
+        with open(subdomains_input, 'r') as file:
+            subdomains_list = [line.strip() for line in file]
+    elif subdomains_input:
+        subdomains_list = [subdomains_input]
     else:
-        with open('subdomains_list.txt', 'r') as file:
-            for line in file:
-                subdomain = f"{line.strip()}.{domain}"
-                try:
-                    dns.resolver.query(subdomain, 'A')
-                    subdomains.append(subdomain)
-                    print(f"Found subdomain: {subdomain}")
-                except dns.resolver.NXDOMAIN:
-                    continue
+        subdomains_list = []
+
+    for subdomain in subdomains_list:
+        try:
+            dns.resolver.query(subdomain, 'A')
+            subdomains.append(subdomain)
+            print(f"Found subdomain: {subdomain}")
+        except dns.resolver.NXDOMAIN:
+            continue
 
     with open('subdomains.txt', 'w') as file:
         for subdomain in subdomains:
@@ -48,23 +47,22 @@ def osint_info(domain):
 
 # WAF detection function using wafw00f
 def waf_detection(target):
-    print("\nWAF Detection:")
     waf_detector = WafW00F(target)
-    success, wafs = waf_detector.identify()
-    if success and wafs:
-        for waf in wafs:
-            print(f"WAF Detected: {waf}")
+    detected_waf, waf_name = waf_detector.identify()
+    print("\nWAF Detection:")
+    if detected_waf:
+        print(f"WAF Detected: {waf_name}")
     else:
         print("No WAF detected")
 
 def main():
     parser = argparse.ArgumentParser(description="Security testing based on OWASP ASVS methodology")
     parser.add_argument("-t", "--target", type=str, required=True, help="Target URL or IP address")
-    parser.add_argument("-s", "--subdomains", type=str, help="Path to subdomains file or specific subdomain")
+    parser.add_argument("-s", "--subdomains", type=str, help="Subdomains file or specified subdomain")
     args = parser.parse_args()
 
     target = args.target
-    subdomains_arg = args.subdomains
+    subdomains_input = args.subdomains
     parsed_url = urlparse(target)
 
     if not parsed_url.scheme:
@@ -74,10 +72,7 @@ def main():
     domain = parsed_url.netloc
 
     # Perform subdomain scanning
-    if subdomains_arg and "." in subdomains_arg:
-        subdomains = [subdomains_arg]
-    else:
-        subdomains = subdomain_scan(domain, subdomain_file=subdomains_arg)
+    subdomains = subdomain_scan(domain, subdomains_input)
 
     # Perform OSINT information gathering
     osint_info(domain)
